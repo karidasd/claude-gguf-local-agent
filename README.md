@@ -10,7 +10,7 @@ app_port: 7860
 
 <div align="center">
 
-<img src="./assets/banner.png" alt="Claude GGUF Local Agent" width="100%"/>
+<img src="https://raw.githubusercontent.com/karidasd/claude-gguf-local-agent/main/assets/banner.png" alt="Claude GGUF Local Agent" width="100%"/>
 
 <br/>
 <br/>
