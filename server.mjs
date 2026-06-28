@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const HISTORY_FILE = path.join(process.cwd(), 'history.json');
 const SETTINGS_FILE = path.join(process.cwd(), 'settings.json');
 
