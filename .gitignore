@@ -1,1 +1,4 @@
-﻿assets/banner.png
+node_modules/
+models/
+*.log
+settings.json
