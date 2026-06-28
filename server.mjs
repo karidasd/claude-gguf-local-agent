@@ -322,6 +322,45 @@ app.get('/download/status', (req, res) => {
     res.json(activeDownload);
 });
 
+// Auto-download default model on boot if directory is empty
+async function autoDownloadDefaultModel() {
+    const agentsDir = await getAgentsDir();
+    try {
+        const files = await fsp.readdir(agentsDir);
+        const ggufs = files.filter(f => f.toLowerCase().endsWith('.gguf'));
+        if (ggufs.length === 0) {
+            console.log("> No local GGUF models found. Initializing background download of Dolphin-3B model...");
+            const repoId = "Bartowski/Dolphin3.0-Llama3.2-3B-GGUF";
+            const filename = "Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf";
+            const outputPath = path.join(agentsDir, filename);
+            const downloadUrl = `https://huggingface.co/${repoId}/resolve/main/${filename}`;
+            
+            const runDownload = (url) => {
+                const reqStream = https.get(url, (response) => {
+                    if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+                        runDownload(response.headers.location);
+                        return;
+                    }
+                    if (response.statusCode === 200) {
+                        const fileStream = fs.createWriteStream(outputPath);
+                        response.pipe(fileStream);
+                        fileStream.on('finish', () => {
+                            fileStream.close();
+                            console.log(`> Auto-download completed! Saved: ${filename}`);
+                        });
+                    }
+                });
+                reqStream.on('error', (err) => {
+                    console.error("> Auto-download failed:", err.message);
+                });
+            };
+            runDownload(downloadUrl);
+        }
+    } catch (e) {
+        console.error("> Auto-download check failed:", e.message);
+    }
+}
+
 app.listen(PORT, async () => {
     const dir = await getAgentsDir();
     console.log(`\n==============================================`);
@@ -329,4 +368,5 @@ app.listen(PORT, async () => {
     console.log(`🌐 Port: http://localhost:${PORT}`);
     console.log(`📁 Model Directory: ${dir}`);
     console.log(`==============================================\n`);
+    await autoDownloadDefaultModel();
 });

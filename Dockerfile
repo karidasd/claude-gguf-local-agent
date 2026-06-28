@@ -26,10 +26,8 @@ COPY . .
 ENV PORT=7860
 EXPOSE 7860
 
-# Create models directory and download Dolphin 3B model
-RUN mkdir -p models && \
-    curl -L -o models/Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf \
-    "https://huggingface.co/Bartowski/Dolphin3.0-Llama3.2-3B-GGUF/resolve/main/Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf"
+# Create models directory
+RUN mkdir -p models
 
 # Set permissions
 RUN chmod -R 777 /app
