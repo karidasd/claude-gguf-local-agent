@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Models & Settings Getters
     async function loadSettings() {
         try {
-            const res = await fetch('http://localhost:5000/settings');
+            const res = await fetch('/settings');
             const data = await res.json();
             settingDirInput.value = data.agentsDir || '';
         } catch(e) {}
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const agentsDir = settingDirInput.value.trim();
         if (!agentsDir) return alert('Please enter a valid directory path.');
         try {
-            const res = await fetch('http://localhost:5000/settings', {
+            const res = await fetch('/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ agentsDir })
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadModels() {
         try {
-            const res = await fetch('http://localhost:5000/models');
+            const res = await fetch('/models');
             const models = await res.json();
             modelSelect.innerHTML = '';
             
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // History loaders
     async function loadHistory() {
         try {
-            const res = await fetch('http://localhost:5000/history');
+            const res = await fetch('/history');
             const history = await res.json();
             historyList.innerHTML = '';
             
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadChat(id) {
         if (isGenerating) return;
         try {
-            const res = await fetch(`http://localhost:5000/history/${id}`);
+            const res = await fetch(`/history/${id}`);
             const chat = await res.json();
             
             currentChatId = chat.id;
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isGenerating) return;
         if (!confirm('Are you sure you want to delete this chat session?')) return;
         try {
-            const res = await fetch(`http://localhost:5000/history/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/history/${id}`, { method: 'DELETE' });
             if (res.ok) {
                 if (currentChatId === id) {
                     startNewChat();
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quickActions.style.display = 'flex';
         promptInput.value = '';
         removeAttachment();
-        fetch('http://localhost:5000/reset', { method: 'POST' }).catch(()=>{});
+        fetch('/reset', { method: 'POST' }).catch(()=>{});
         showView('chats');
         loadHistory();
     }
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fileContext: fileContentToSend
             };
 
-            const response = await fetch('http://localhost:5000/chat', {
+            const response = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             startDownloadBtn.disabled = true;
-            const res = await fetch('http://localhost:5000/download', {
+            const res = await fetch('/download', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ repoId, filename })
@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         downloadInterval = setInterval(async () => {
             try {
-                const res = await fetch('http://localhost:5000/download/status');
+                const res = await fetch('/download/status');
                 const data = await res.json();
                 
                 if (data.status === 'downloading') {
