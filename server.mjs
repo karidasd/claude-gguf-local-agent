@@ -14,8 +14,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
 const PORT = process.env.PORT || 5000;
-const HISTORY_FILE = path.join(process.cwd(), 'history.json');
-const SETTINGS_FILE = path.join(process.cwd(), 'settings.json');
+// On Linux cloud (HuggingFace), /app may be read-only — use /tmp for writable storage
+const DATA_DIR = process.platform === 'linux' ? '/tmp' : process.cwd();
+const HISTORY_FILE = path.join(DATA_DIR, 'history.json');
+const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 
 let llama = null;
 let currentModelFileName = null;
@@ -38,14 +40,19 @@ let activeDownload = {
 async function getHistoryData() {
     try {
         const data = await fsp.readFile(HISTORY_FILE, 'utf8');
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : [];
     } catch {
         return [];
     }
 }
 
 async function saveHistoryData(data) {
-    await fsp.writeFile(HISTORY_FILE, JSON.stringify(data, null, 2));
+    try {
+        await fsp.writeFile(HISTORY_FILE, JSON.stringify(data, null, 2));
+    } catch (e) {
+        console.error('> Warning: Could not save history:', e.message);
+    }
 }
 
 async function getAgentsDir() {
