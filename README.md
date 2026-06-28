@@ -12,6 +12,10 @@ app_port: 7860
 
 🚀 **A local model runtime and streaming chatbot interface that replicates the Claude Web UI, built for running GGUF weights locally on your hardware.**
 
+👉 **[Launch the Interactive Cloud Agent on HuggingFace Spaces!](https://huggingface.co/spaces/karidasd/claude-gguf-local-agent)**
+
+👉 **[Launch the Static Web Demonstration on GitHub Pages!](https://karidasd.github.io/claude-gguf-local-agent/)**
+
 This project allows you to manage local model paths, download weights directly from HuggingFace, attach text/markdown document contexts, and chat completely offline with zero API keys or external queries.
 
 ---
