@@ -1,3 +1,13 @@
+---
+title: Claude GGUF Local Agent UI
+emoji: 🤖
+colorFrom: green
+colorTo: blue
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # Claude GGUF - Local Agent UI & HuggingFace Downloader
 
 🚀 **A local model runtime and streaming chatbot interface that replicates the Claude Web UI, built for running GGUF weights locally on your hardware.**
