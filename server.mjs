@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import https from 'https';
+import http from 'http';
 import { URL } from 'url';
 import { getLlama, LlamaChatSession } from "node-llama-cpp";
 
@@ -334,10 +335,21 @@ async function autoDownloadDefaultModel() {
             const filename = "Dolphin3.0-Llama3.2-3B-Q5_K_M.gguf";
             const outputPath = path.join(agentsDir, filename);
             const downloadUrl = `https://huggingface.co/${repoId}/resolve/main/${filename}`;
-            
-            const runDownload = (url) => {
-                const reqStream = https.get(url, (response) => {
+
+            const runDownload = (urlStr) => {
+                // Always resolve relative URLs to absolute
+                let resolvedUrl;
+                try {
+                    resolvedUrl = new URL(urlStr);
+                } catch (_) {
+                    // Relative URL — resolve against huggingface.co
+                    resolvedUrl = new URL(urlStr, 'https://huggingface.co');
+                }
+
+                const transport = resolvedUrl.protocol === 'https:' ? https : http;
+                const reqStream = transport.get(resolvedUrl.toString(), (response) => {
                     if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+                        response.resume(); // consume response to free socket
                         runDownload(response.headers.location);
                         return;
                     }
@@ -348,6 +360,11 @@ async function autoDownloadDefaultModel() {
                             fileStream.close();
                             console.log(`> Auto-download completed! Saved: ${filename}`);
                         });
+                        fileStream.on('error', (err) => {
+                            console.error("> File write failed:", err.message);
+                        });
+                    } else {
+                        console.error(`> Auto-download: unexpected status ${response.statusCode}`);
                     }
                 });
                 reqStream.on('error', (err) => {
